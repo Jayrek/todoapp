@@ -54,6 +54,7 @@ class TodoListScreen extends StatelessWidget {
             itemCount: todos.length,
             itemBuilder: (context, index) {
               var todo = todos[index];
+              final isDone = todo['status'] == 0 ? true : false;
               final timestamp = todo['created_date'];
               final dateTime = timestamp.toDate();
               final dateFormatted = DateFormat('MM/dd').format(dateTime);
@@ -67,15 +68,19 @@ class TodoListScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   child: ListTile(
                     title: Text(todo['name'],
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        )),
+                        style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
                     subtitle: Text(todo['description'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                        )),
-                    trailing: Text(dateFormatted,
+                        style: TextStyle(
+                            fontSize: 20,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
+                    trailing: Text(isDone ? '' : dateFormatted,
                         style: const TextStyle(
                           fontSize: 15,
                           fontStyle: FontStyle.italic,
