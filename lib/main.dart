@@ -1,7 +1,6 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:todoapp/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:todoapp/firebase_options.dart';
 
 void main() async {
@@ -26,18 +25,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SignInScreen(),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // final todoReference = FirebaseFirestore.instance.collection('todo');
-
     return const Scaffold(
         body: Center(
       child: Text('dfd'),
