@@ -1,10 +1,9 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:todoapp/features/auth/sign_in/screen/sign_in_screen.dart';
-import 'package:todoapp/features/auth/sign_up/screen/sign_up_screen.dart';
-import 'package:todoapp/firebase_options.dart';
-import 'package:todoapp/shared/widgets/custom_elevated_button_widget.dart';
+import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
+import 'package:mytodolist/firebase_options.dart';
+import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'My ToDo List',
       theme: ThemeData(
         fontFamily: 'Poppins',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

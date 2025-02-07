@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/shared/widgets/custom_elevated_button_widget.dart';
-import 'package:todoapp/shared/widgets/custom_textformfield_widget.dart';
+import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
+import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
 
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
@@ -14,12 +14,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
