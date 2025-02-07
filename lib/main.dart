@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
+import 'package:mytodolist/features/todo_list/screen/todo_list_screen.dart';
 import 'package:mytodolist/firebase_options.dart';
 import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const TodoListScreen(ownerId: '1jOy0FR6VUeCkwZHAHHJ2jdm6vt2'),
     );
   }
 }
