@@ -21,13 +21,13 @@ class _HomeScreenState extends State<HomeScreen> {
     //   Navigator.of(context)
     //       .pushNamedAndRemoveUntil('/todoList', (route) => false);
     // }
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user != null) {
-        // user is signed in
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/todoList', (route) => false);
-      }
-    });
+    // FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    //   if (user != null) {
+    //     // user is signed in
+    //     Navigator.of(context)
+    //         .pushNamedAndRemoveUntil('/todoList', (route) => false);
+    //   }
+    // });
     setState(() => isLoadingUser = false);
   }
 
