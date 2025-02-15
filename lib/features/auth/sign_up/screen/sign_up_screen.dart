@@ -1,15 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
 
-class SignUpScreen extends StatelessWidget {
-  SignUpScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
 
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+
+  bool isSigningUp = false;
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +121,23 @@ class SignUpScreen extends StatelessWidget {
                     Expanded(
                       child: CustomElevatedButtonWidget(
                         backgroundColor: Colors.black87,
-                        labelText: 'REGISTER',
+                        childWidget: isSigningUp
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'REGISTER',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                         onPressed: () async {
-                          if (_formKey.currentState!.validate()) {}
+                          if (_formKey.currentState!.validate()) {
+                            await _signUpUser(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                              name: _fullNameController.text,
+                            );
+                          }
                         },
                       ),
                     ),
@@ -141,5 +165,72 @@ class SignUpScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _signUpUser({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    try {
+      setState(() => isSigningUp = true);
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        await _addUserToFirestore(
+          userId: credential.user!.uid,
+          name: _fullNameController.text,
+          email: email,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        debugPrint('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        debugPrint('The account already exists for that email.');
+      } else {
+        debugPrint(e.code);
+      }
+
+      if (!mounted) return;
+      setState(() => isSigningUp = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.code)));
+    }
+  }
+
+  Future<void> _addUserToFirestore({
+    required String userId,
+    required String name,
+    required String email,
+  }) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final userId = auth.currentUser?.uid;
+
+    CollectionReference user = FirebaseFirestore.instance.collection('user');
+    try {
+      await user.doc(userId).set({
+        'id': user.doc().id,
+        'uid': userId,
+        'name': name,
+        'email': email,
+        'created_at': Timestamp.now(),
+        'updated_at': Timestamp.now(),
+      });
+      await Future.delayed(const Duration(seconds: 3), () {
+        setState(() => isSigningUp = false);
+        // if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/todoList', (route) => false);
+      });
+    } on FirebaseException catch (e) {
+      if (!mounted) return;
+      setState(() => isSigningUp = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.code)));
+    }
   }
 }
