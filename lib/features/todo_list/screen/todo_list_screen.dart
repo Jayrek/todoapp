@@ -31,12 +31,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
         setState(() {
           _userData = userData;
         });
-        print("User found: ${userData['name']} - ${userData['email']}");
+        debugPrint("User found: ${userData['name']} - ${userData['email']}");
       } else {
-        print("No user found with UID: $userId");
+        debugPrint("No user found with UID: $userId");
       }
     } catch (e) {
-      print("Error fetching user: $e");
+      debugPrint("Error fetching user: $e");
     }
   }
 
