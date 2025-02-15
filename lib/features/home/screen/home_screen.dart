@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
