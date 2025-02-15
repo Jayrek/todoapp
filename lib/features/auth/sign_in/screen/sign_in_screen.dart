@@ -4,12 +4,20 @@ import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
 import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
 
-class SignInScreen extends StatelessWidget {
-  SignInScreen({super.key});
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+
+  bool isLoggingIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +92,15 @@ class SignInScreen extends StatelessWidget {
                       Expanded(
                         child: CustomElevatedButtonWidget(
                           backgroundColor: Colors.black87,
-                          labelText: 'LOGIN',
+                          childWidget: isLoggingIn
+                              ? const CircularProgressIndicator()
+                              : const Text(
+                                  'LOGIN',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               _signInUser(_emailController.text,
@@ -108,7 +124,7 @@ class SignInScreen extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
+                              builder: (context) => const SignUpScreen(),
                             ));
                       },
                       child: const Text(
@@ -126,16 +142,31 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> _signInUser(String email, String password) async {
     try {
+      setState(() => isLoggingIn = true);
+
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      debugPrint('credential: $credential');
+      if (credential.user != null) {
+        debugPrint('credential: $credential');
+        if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/todoList', (route) => false);
+      }
+      setState(() => isLoggingIn = false);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      setState(() => isLoggingIn = false);
+      if (e.code == 'invalid-credential') {
+        debugPrint('Invalid credential!');
       } else if (e.code == 'wrong-password') {
         debugPrint('Wrong password!');
+      } else {
+        debugPrint(e.code);
       }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.code)));
     }
   }
 }
