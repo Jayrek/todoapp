@@ -89,12 +89,18 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _userData!['photoUrl'].toString().isNotEmpty
-                          ? CircleAvatar(
-                              radius: 30,
-                              backgroundImage:
-                                  NetworkImage(_userData?['photoUrl']))
-                          : const SizedBox(),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: _userData!['photoUrl'] != null &&
+                                _userData!['photoUrl'].toString().isNotEmpty
+                            ? NetworkImage(_userData!['photoUrl'])
+                            : null, // No image if empty
+                        child: (_userData!['photoUrl'] == null ||
+                                _userData!['photoUrl'].toString().isEmpty)
+                            ? const Icon(Icons.person,
+                                color: Colors.white) // Show icon when no image
+                            : null,
+                      ),
                       const SizedBox(width: 10),
                       Text('Hi! ${_userData?['name']}!'),
                     ],
