@@ -219,6 +219,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'email': email,
         'created_at': Timestamp.now(),
         'updated_at': Timestamp.now(),
+        'provider': 'email',
       });
       await Future.delayed(const Duration(seconds: 3), () {
         setState(() => isSigningUp = false);
