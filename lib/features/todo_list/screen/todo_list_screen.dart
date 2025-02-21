@@ -14,29 +14,26 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Map<String, dynamic>? _userData;
 
   Future<void> getUserByDocID() async {
-    final String? userId = FirebaseAuth.instance.currentUser?.uid;
-    // if (userId == null) {
-    //   print("No user signed in");
-    //   return;
-    // }
+    final user = FirebaseAuth.instance.currentUser;
+    debugPrint('user: $user');
+    if (user != null) {
+      final String userId = user.uid;
 
-    DocumentReference userDoc =
-        FirebaseFirestore.instance.collection('user').doc(userId);
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('user').doc(userId);
 
-    try {
-      DocumentSnapshot snapshot = await userDoc.get();
+      try {
+        DocumentSnapshot snapshot = await userDoc.get();
 
-      if (snapshot.exists) {
-        final userData = snapshot.data() as Map<String, dynamic>;
-        setState(() {
-          _userData = userData;
-        });
-        debugPrint("User found: ${userData['name']} - ${userData['email']}");
-      } else {
-        debugPrint("No user found with UID: $userId");
+        if (snapshot.exists) {
+          final userData = snapshot.data() as Map<String, dynamic>;
+          setState(() => _userData = userData);
+        } else {
+          debugPrint("no user found with UID: $userId");
+        }
+      } catch (e) {
+        debugPrint("error fetching user: $e");
       }
-    } catch (e) {
-      debugPrint("Error fetching user: $e");
     }
   }
 
@@ -86,7 +83,26 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ),
       body: Column(
         children: [
-          Text('Hi ${_userData?['name']}!'),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: _userData != null
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _userData!['photoUrl'].toString().isNotEmpty
+                          ? CircleAvatar(
+                              radius: 30,
+                              backgroundImage:
+                                  NetworkImage(_userData?['photoUrl']))
+                          : const SizedBox(),
+                      const SizedBox(width: 10),
+                      Text('Hi! ${_userData?['name']}!'),
+                    ],
+                  )
+                : const SizedBox(),
+          ),
+          const Divider(height: 1, indent: 20, endIndent: 20),
+          const SizedBox(height: 10),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: fetchUsersStream(),

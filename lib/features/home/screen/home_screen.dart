@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
@@ -106,8 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                onPressed: () {
-                                  _signInWithGoogle();
+                                onPressed: () async {
+                                  await _signInWithGoogle();
                                 },
                               ),
                             ),
@@ -127,7 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await _signInWithFacebook();
+                                },
                               ),
                             ),
                           ],
@@ -185,15 +188,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // once signed in, return the UserCredential
       final user = await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? firesbaseUser = user.user;
+      final photoUrl = user.user!.photoURL!;
+      final User? firebaseUser = user.user;
       debugPrint('user: ${user.user}');
+      debugPrint('photoUrlGoogle: $photoUrl');
 
-      if (firesbaseUser != null) {
+      if (firebaseUser != null) {
         // saving google info to user firestore collection
         await _addUserToFirestore(
-          userId: firesbaseUser.uid,
-          name: firesbaseUser.displayName ?? '',
-          email: firesbaseUser.email ?? '',
+          userId: firebaseUser.uid,
+          name: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          provider: 'google.com',
+          photoUrl: photoUrl,
         );
       }
     } catch (e) {
@@ -201,10 +208,46 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _signInWithFacebook() async {
+    try {
+      // trigger the sign-in flow
+      final LoginResult loginResult = await FacebookAuth.instance
+          .login(permissions: ['email', 'public_profile']);
+
+      // create a credential from the access token
+      final OAuthCredential credential = FacebookAuthProvider.credential(
+          loginResult.accessToken?.tokenString ?? '');
+
+      // once signed in, return the UserCredential
+      final user = await FirebaseAuth.instance.signInWithCredential(credential);
+      final additionInfo = user.additionalUserInfo;
+      final String photoUrl =
+          additionInfo?.profile?['picture']['data']['url'] ?? '';
+      debugPrint('user: $user');
+      debugPrint('photoUrl: $photoUrl');
+
+      final firebaseUser = user.user;
+      if (firebaseUser != null) {
+        // saving google info to user firestore collection
+        await _addUserToFirestore(
+          userId: firebaseUser.uid,
+          name: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          provider: 'facebook.com',
+          photoUrl: photoUrl,
+        );
+      }
+    } catch (e) {
+      debugPrint('error signing in facebook: $e');
+    }
+  }
+
   Future<void> _addUserToFirestore({
     required String userId,
     required String name,
     required String email,
+    required String provider,
+    required String photoUrl,
   }) async {
     CollectionReference user = FirebaseFirestore.instance.collection('user');
     try {
@@ -215,7 +258,8 @@ class _HomeScreenState extends State<HomeScreen> {
         'email': email,
         'created_at': Timestamp.now(),
         'updated_at': Timestamp.now(),
-        'provider': 'google',
+        'provider': provider,
+        'photoUrl': photoUrl,
       });
       await Future.delayed(const Duration(seconds: 3), () {
         Navigator.pushNamedAndRemoveUntil(
