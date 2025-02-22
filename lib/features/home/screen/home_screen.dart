@@ -5,6 +5,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
+import 'package:mytodolist/shared/helper/constants.dart';
 import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,33 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isLoadingUser = true;
-
-  void getSignedInUser() {
-    final user = FirebaseAuth.instance.currentUser;
-    debugPrint('getSignedInUser: $user');
-
-    setState(() => isLoadingUser = false);
-
-    Future.delayed(Duration.zero, () {
-      if (user != null) {
-        // user is signed in
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/todoList', (route) => false);
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // for testing
-    setState(() => isLoadingUser = true);
-
-    Future.delayed(const Duration(seconds: 2), () {
-      getSignedInUser();
-    });
-  }
+  bool isFacebookLoggingIn = false;
+  bool isGoogleLoggingIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,126 +25,127 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: Stack(
           children: [
-            isLoadingUser
-                ? const CircularProgressIndicator()
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'My ToDo LiSt',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -2,
+                    fontSize: 50,
+                  ),
+                ),
+                const Text(
+                  'Welcome back!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -2,
+                    fontSize: 30,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
                     children: [
-                      const Text(
-                        'My ToDo LiSt',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -2,
-                          fontSize: 50,
-                        ),
-                      ),
-                      const Text(
-                        'Welcome back!',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -2,
-                          fontSize: 30,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomElevatedButtonWidget(
-                                    backgroundColor: Colors.black87,
-                                    childWidget: const Text(
-                                      'LOGIN',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SignInScreen(),
-                                          ));
-                                    },
-                                  ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomElevatedButtonWidget(
+                              backgroundColor: Colors.black87,
+                              childWidget: const Text(
+                                'LOGIN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SignInScreen(),
+                                    ));
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomElevatedButtonWidget(
-                                    backgroundColor: Colors.white,
-                                    borderColor: Colors.black87,
-                                    childWidget: const Text(
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomElevatedButtonWidget(
+                              backgroundColor: Colors.white,
+                              borderColor: Colors.black87,
+                              childWidget: isGoogleLoggingIn
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
                                       'SIGN IN WITH GOOGLE',
                                       style: TextStyle(
                                         color: Colors.black87,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    onPressed: () async {
-                                      await _signInWithGoogle();
-                                    },
-                                  ),
-                                ),
-                              ],
+                              onPressed: () async {
+                                await _signInWithGoogle();
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomElevatedButtonWidget(
-                                    backgroundColor: Colors.white,
-                                    borderColor: Colors.black87,
-                                    childWidget: const Text(
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomElevatedButtonWidget(
+                              backgroundColor: Colors.white,
+                              borderColor: Colors.black87,
+                              childWidget: isFacebookLoggingIn
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
                                       'SIGN IN WITH FACEBOOK',
                                       style: TextStyle(
                                         color: Colors.black87,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    onPressed: () async {
-                                      await _signInWithFacebook();
-                                    },
-                                  ),
-                                ),
-                              ],
+                              onPressed: () async {
+                                await _signInWithFacebook();
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Don't have an account yet?",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignUpScreen(),
-                                        ));
-                                  },
-                                  child: const Text(
-                                    'Register',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                )
-                              ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account yet?",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpScreen(),
+                                  ));
+                            },
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(fontSize: 14),
                             ),
-                          ],
-                        ),
+                          )
+                        ],
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -177,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _signInWithGoogle() async {
     try {
+      setState(() => isGoogleLoggingIn = true);
       final GoogleSignIn googleSignIn = GoogleSignIn();
       await googleSignIn.signOut();
 
@@ -206,17 +184,22 @@ class _HomeScreenState extends State<HomeScreen> {
           userId: firebaseUser.uid,
           name: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? '',
-          provider: 'google.com',
+          provider: Provider.google.provider,
           photoUrl: photoUrl,
         );
       }
     } catch (e) {
+      if (!mounted) return;
+      setState(() => isGoogleLoggingIn = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('google exception: $e')));
       debugPrint('error signing in google: $e');
     }
   }
 
   Future<void> _signInWithFacebook() async {
     try {
+      setState(() => isFacebookLoggingIn = true);
       // trigger the sign-in flow
       final LoginResult loginResult = await FacebookAuth.instance
           .login(permissions: ['email', 'public_profile']);
@@ -240,11 +223,15 @@ class _HomeScreenState extends State<HomeScreen> {
           userId: firebaseUser.uid,
           name: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? '',
-          provider: 'facebook.com',
+          provider: Provider.facebook.provider,
           photoUrl: photoUrl,
         );
       }
     } catch (e) {
+      setState(() => isFacebookLoggingIn = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('facebook exception: $e')));
       debugPrint('error signing in facebook: $e');
     }
   }
@@ -269,13 +256,21 @@ class _HomeScreenState extends State<HomeScreen> {
         'photoUrl': photoUrl,
       });
       await Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          isFacebookLoggingIn = false;
+          isGoogleLoggingIn = false;
+        });
         Navigator.pushNamedAndRemoveUntil(
             context, '/todoList', (route) => false);
       });
     } on FirebaseException catch (e) {
+      setState(() {
+        isFacebookLoggingIn = false;
+        isGoogleLoggingIn = false;
+      });
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.code)));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('saving user exception: ${e.code}')));
     }
   }
 }
