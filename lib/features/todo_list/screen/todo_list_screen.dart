@@ -84,99 +84,123 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: _userData != null
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: _userData!['photoUrl'] != null &&
-                                _userData!['photoUrl'].toString().isNotEmpty
-                            ? NetworkImage(_userData!['photoUrl'])
-                            : null, // No image if empty
-                        child: (_userData!['photoUrl'] == null ||
-                                _userData!['photoUrl'].toString().isEmpty)
-                            ? const Icon(Icons.person,
-                                color: Colors.white) // Show icon when no image
-                            : null,
-                      ),
-                      const SizedBox(width: 10),
-                      Text('Hi! ${_userData?['name']}!'),
-                    ],
-                  )
-                : const SizedBox(),
-          ),
+          _buildHeaderAccountHeaderWidget(),
           const Divider(height: 1, indent: 20, endIndent: 20),
           const SizedBox(height: 10),
-          Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: fetchUsersStream(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                }
-
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Your Todo LiSt is empty."));
-                }
-
-                List<Map<String, dynamic>> todos = snapshot.data!;
-
-                return ListView.builder(
-                  itemCount: todos.length,
-                  itemBuilder: (context, index) {
-                    var todo = todos[index];
-                    final isDone = todo['status'] == 0 ? true : false;
-                    final timestamp = todo['created_date'];
-                    final dateTime = timestamp.toDate();
-                    final dateFormatted = DateFormat('MM/dd').format(dateTime);
-                    return Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      color:
-                          isDone ? Colors.grey.shade500 : Colors.blue.shade100,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: ListTile(
-                          title: Text(todo['name'],
-                              style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: isDone
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none)),
-                          subtitle: Text(todo['description'],
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  decoration: isDone
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none)),
-                          trailing: Text(isDone ? '' : dateFormatted,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.bold,
-                              )),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+          _buildTodoListWidget(),
         ],
       ),
+    );
+  }
+
+  Widget _buildHeaderAccountHeaderWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: _userData != null
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: _userData!['photoUrl'] != null &&
+                          _userData!['photoUrl'].toString().isNotEmpty
+                      ? NetworkImage(_userData!['photoUrl'])
+                      : null, // No image if empty
+                  child: (_userData!['photoUrl'] == null ||
+                          _userData!['photoUrl'].toString().isEmpty)
+                      ? const Icon(Icons.person,
+                          color: Colors.white) // Show icon when no image
+                      : null,
+                ),
+                const SizedBox(width: 10),
+                Text('Hi! ${_userData?['name']}!'),
+              ],
+            )
+          : const SizedBox(),
+    );
+  }
+
+  Widget _buildTodoListWidget() {
+    return Expanded(
+      child: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: fetchUsersStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Your Todo LiSt is empty."));
+          }
+
+          List<Map<String, dynamic>> todos = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: todos.length,
+            itemBuilder: (context, index) {
+              var todo = todos[index];
+              final isDone = todo['status'] == 0 ? true : false;
+              final timestamp = todo['created_date'];
+              final dateTime = timestamp.toDate();
+              final dateFormatted = DateFormat('MM/dd').format(dateTime);
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                color: isDone ? Colors.grey.shade500 : Colors.blue.shade100,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: _buildTodoItemWidget(
+                      todoName: todo['name'],
+                      todoDescription: todo['description'],
+                      isDone: isDone,
+                      dateFormatted: dateFormatted,
+                      onTap: () {
+                        debugPrint('fd');
+                      }),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTodoItemWidget({
+    required String todoName,
+    required String todoDescription,
+    required bool isDone,
+    required String dateFormatted,
+    required Function()? onTap,
+  }) {
+    return ListTile(
+      title: Text(todoName,
+          style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              decoration:
+                  isDone ? TextDecoration.lineThrough : TextDecoration.none)),
+      subtitle: Text(todoDescription,
+          style: TextStyle(
+              fontSize: 20,
+              decoration:
+                  isDone ? TextDecoration.lineThrough : TextDecoration.none)),
+      trailing: Text(
+        isDone ? '' : dateFormatted,
+        style: const TextStyle(
+          fontSize: 15,
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }
