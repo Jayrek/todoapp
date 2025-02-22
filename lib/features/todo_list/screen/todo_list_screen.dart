@@ -68,7 +68,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
           IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/home', (route) => false);
             },
             icon: const Icon(Icons.logout_outlined),
           )
