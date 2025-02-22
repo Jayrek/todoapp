@@ -128,10 +128,11 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     final userId = auth.currentUser?.uid;
 
     CollectionReference todo = FirebaseFirestore.instance.collection('todo');
+    DocumentReference docRef = todo.doc();
 
     try {
-      await todo.add({
-        'id': todo.doc().id,
+      await docRef.set({
+        'id': docRef.id,
         'created_by': userId,
         'description': description,
         'name': name,
@@ -162,7 +163,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
 //   try {
 //     await todo.doc(todoId).update({
 //       'status': 0,
-//       'updated_date': Timestamp.now(), // Optionally update timestamp
+//       'updated_date': Timestamp.now(), 
 //     });
 
 //     if (!mounted) return;
