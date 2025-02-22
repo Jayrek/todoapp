@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
 import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
 
+import '../../../../shared/helper/constants.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -219,7 +221,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'email': email,
         'created_at': Timestamp.now(),
         'updated_at': Timestamp.now(),
-        'provider': 'email',
+        'provider': Provider.email.provider,
         'photoUrl': '',
       });
       await Future.delayed(const Duration(seconds: 3), () {
