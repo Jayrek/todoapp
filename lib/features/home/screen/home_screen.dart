@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:mytodolist/features/auth/sign_in/screen/sign_in_screen.dart';
-import 'package:mytodolist/features/auth/sign_up/screen/sign_up_screen.dart';
-import 'package:mytodolist/shared/helper/constants.dart';
-import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
+
+import '../../../shared/helper/constants.dart';
+import '../../../shared/widgets/custom_elevated_button_widget.dart';
+import '../../auth/sign_in/screen/sign_in_screen.dart';
+import '../../auth/sign_up/screen/sign_up_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,16 @@ class _HomeScreenState extends State<HomeScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/notification');
+                  },
+                  child: const Text(
+                    'Notificaton',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
                 const Text(
                   'My ToDo LiSt',
                   style: TextStyle(
@@ -62,11 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SignInScreen(),
-                                    ));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignInScreen(),
+                                  ),
+                                );
                               },
                             ),
                           ),
@@ -79,15 +90,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: CustomElevatedButtonWidget(
                               backgroundColor: Colors.white,
                               borderColor: Colors.black87,
-                              childWidget: isGoogleLoggingIn
-                                  ? const CircularProgressIndicator()
-                                  : const Text(
-                                      'SIGN IN WITH GOOGLE',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold,
+                              childWidget:
+                                  isGoogleLoggingIn
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                        'SIGN IN WITH GOOGLE',
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
                               onPressed: () async {
                                 await _signInWithGoogle();
                               },
@@ -102,15 +114,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: CustomElevatedButtonWidget(
                               backgroundColor: Colors.white,
                               borderColor: Colors.black87,
-                              childWidget: isFacebookLoggingIn
-                                  ? const CircularProgressIndicator()
-                                  : const Text(
-                                      'SIGN IN WITH FACEBOOK',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold,
+                              childWidget:
+                                  isFacebookLoggingIn
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                        'SIGN IN WITH FACEBOOK',
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
                               onPressed: () async {
                                 await _signInWithFacebook();
                               },
@@ -129,16 +142,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           TextButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SignUpScreen(),
-                                  ));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SignUpScreen(),
+                                ),
+                              );
                             },
                             child: const Text(
                               'Register',
                               style: TextStyle(fontSize: 14),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ],
@@ -191,8 +205,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => isGoogleLoggingIn = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('google exception: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('google exception: $e')));
       debugPrint('error signing in google: $e');
     }
   }
@@ -201,12 +216,14 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       setState(() => isFacebookLoggingIn = true);
       // trigger the sign-in flow
-      final LoginResult loginResult = await FacebookAuth.instance
-          .login(permissions: ['email', 'public_profile']);
+      final LoginResult loginResult = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
 
       // create a credential from the access token
       final OAuthCredential credential = FacebookAuthProvider.credential(
-          loginResult.accessToken?.tokenString ?? '');
+        loginResult.accessToken?.tokenString ?? '',
+      );
 
       // once signed in, return the UserCredential
       final user = await FirebaseAuth.instance.signInWithCredential(credential);
@@ -230,8 +247,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       setState(() => isFacebookLoggingIn = false);
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('facebook exception: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('facebook exception: $e')));
       debugPrint('error signing in facebook: $e');
     }
   }
@@ -261,7 +279,10 @@ class _HomeScreenState extends State<HomeScreen> {
           isGoogleLoggingIn = false;
         });
         Navigator.pushNamedAndRemoveUntil(
-            context, '/todoList', (route) => false);
+          context,
+          '/todoList',
+          (route) => false,
+        );
       });
     } on FirebaseException catch (e) {
       setState(() {
@@ -270,7 +291,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('saving user exception: ${e.code}')));
+        SnackBar(content: Text('saving user exception: ${e.code}')),
+      );
     }
   }
 }

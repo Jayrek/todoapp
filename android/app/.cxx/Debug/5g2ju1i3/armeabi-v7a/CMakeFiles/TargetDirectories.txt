@@ -1,2 +1,0 @@
-/Users/jayrektabasa/Desktop/aclc notes/csme2/MIDTERM/todoapp/todoapp/android/app/.cxx/Debug/5g2ju1i3/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-/Users/jayrektabasa/Desktop/aclc notes/csme2/MIDTERM/todoapp/todoapp/android/app/.cxx/Debug/5g2ju1i3/armeabi-v7a/CMakeFiles/edit_cache.dir

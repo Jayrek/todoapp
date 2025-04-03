@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
-import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
 
 import '../../../../shared/helper/constants.dart';
+import '../../../../shared/widgets/custom_elevated_button_widget.dart';
+import '../../../../shared/widgets/custom_textformfield_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -123,15 +123,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Expanded(
                       child: CustomElevatedButtonWidget(
                         backgroundColor: Colors.black87,
-                        childWidget: isSigningUp
-                            ? const CircularProgressIndicator()
-                            : const Text(
-                                'REGISTER',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                        childWidget:
+                            isSigningUp
+                                ? const CircularProgressIndicator()
+                                : const Text(
+                                  'REGISTER',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             await _signUpUser(
@@ -155,11 +156,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(
-                      'Log In',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  )
+                    child: const Text('Log In', style: TextStyle(fontSize: 14)),
+                  ),
                 ],
               ),
             ],
@@ -176,11 +174,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }) async {
     try {
       setState(() => isSigningUp = true);
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       if (credential.user != null) {
         await _addUserToFirestore(
           userId: credential.user!.uid,
@@ -199,8 +194,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (!mounted) return;
       setState(() => isSigningUp = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.code)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.code)));
     }
   }
 
@@ -228,13 +224,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() => isSigningUp = false);
         // if (!mounted) return;
         Navigator.pushNamedAndRemoveUntil(
-            context, '/todoList', (route) => false);
+          context,
+          '/todoList',
+          (route) => false,
+        );
       });
     } on FirebaseException catch (e) {
       if (!mounted) return;
       setState(() => isSigningUp = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.code)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.code)));
     }
   }
 }

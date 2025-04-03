@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mytodolist/shared/widgets/custom_elevated_button_widget.dart';
-import 'package:mytodolist/shared/widgets/custom_textformfield_widget.dart';
+
+import '../../../shared/widgets/custom_elevated_button_widget.dart';
+import '../../../shared/widgets/custom_textformfield_widget.dart';
 
 class AddTodoScreen extends StatefulWidget {
   const AddTodoScreen({super.key});
@@ -22,9 +23,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('NeW ToDo'),
-      ),
+      appBar: AppBar(title: const Text('NeW ToDo')),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -88,15 +87,16 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                       Expanded(
                         child: CustomElevatedButtonWidget(
                           backgroundColor: Colors.black87,
-                          childWidget: isAddingTodo
-                              ? const CircularProgressIndicator()
-                              : const Text(
-                                  'ADD',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                          childWidget:
+                              isAddingTodo
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                    'ADD',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               await addTodo(
@@ -150,8 +150,9 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     } on FirebaseException catch (e) {
       setState(() => isAddingTodo = false);
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.code)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.code)));
     }
   }
 }
@@ -163,7 +164,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
 //   try {
 //     await todo.doc(todoId).update({
 //       'status': 0,
-//       'updated_date': Timestamp.now(), 
+//       'updated_date': Timestamp.now(),
 //     });
 
 //     if (!mounted) return;
